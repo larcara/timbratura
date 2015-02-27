@@ -6,7 +6,7 @@ class ClocksController < ApplicationController
   # GET /clocks
   # GET /clocks.json
   def index
-
+    redirect_to url_for(action: :dashboard) if current_user.is_camera?
     @clocks = Clock.all
   end
 
@@ -15,7 +15,7 @@ class ClocksController < ApplicationController
   # GET /clocks.json
   def dashboard
     current_date=Date.today
-    @clocks = Clock.joins(:user).where(date: current_date).group_by{|x| [x.user.area, x.user.username, x.action]}
+    @clocks = Clock.joins(:user).where(date: current_date).group_by{|x| [x.user.area, x.user.username]}
   end
 
   # GET /clocks/1
@@ -26,13 +26,11 @@ class ClocksController < ApplicationController
 
   # GET /clocks/new
   def new
-    @preset_ip=Setting.where(group: "ips", key: request.remote_ip).first
+    redirect_to url_for(action: :dashboard) if current_user.is_camera?
+    #@preset_ip=Setting.where(group: "ips", key: request.remote_ip).first
     @moment=Time.now.at_beginning_of_minute
-    if @preset_ip.nil?
-      @clock = Clock.new()
-    else
-      @clock = Clock.new(user: @preset_ip.value)
-     end
+    @clock = Clock.new()
+
   end
 
   # GET /clocks/1/edit
@@ -54,9 +52,9 @@ class ClocksController < ApplicationController
     #@moment=@moment.advance(minutes: -(@moment.min % 5))
     respond_to do |format|
       if @clock.save
-        message="Registrazione #{@clock.action} per #{@clock.user.username} alle #{@clock.time} avvenuta con successo."
-        AdminMailer.timesheet(Date.today).deliver
-        AdminMailer.confirm_mail(current_user, message).deliver
+        message="Registrazione #{@clock.action} per #{@clock.user.username} alle #{@clock.time.localtime} avvenuta con successo."
+        #AdminMailer.timesheet(Date.today).deliver
+        #AdminMailer.confirm_mail(current_user, "#{message}\r\n#{@clock.message}").deliver
 
         format.html { redirect_to new_clock_url, notice: message }
         format.json { render :show, status: :created, location: @clock }

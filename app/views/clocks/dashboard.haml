@@ -1,14 +1,17 @@
 
 
 - @clocks.each do |k,clocks|
-  %h1="AREA #{k[0]}"
-  -uless k[0].blank?
+  %h1="AREA #{k[0]}" unless k[0].blank?
+  -unless k[0].blank?
     %table.table.table-striped
       %tr
         %th utente
         %th check-in
+        %th
         %th check-out
+        %th
       %tr
         %td= k[1]
         -clocks.each do |clock|
           %td= clock.action
+          %td= clock.time

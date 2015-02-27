@@ -19,6 +19,12 @@
     = javascript_include_tag "application"  , 'data-turbolinks-track' => true
 
   %body
+    = link_to "elenco utenti", users_path if current_user && current_user.is_admin?
+    = link_to "elenco accessi", clocks_path if current_user && current_user.is_admin?
+    = link_to "dashboard", url_for(controller: 'clocks', action: :dashboard) if current_user && current_user.is_camera?
+    = link_to "Log Out",  destroy_user_session_path if current_user
+    = link_to "Cambia password", edit_user_registration_path if current_user
+
     .container.center
       -if notice
         %h3.bg-success.well-sm= notice

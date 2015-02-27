@@ -29,11 +29,11 @@ class Clock < ActiveRecord::Base
     last_check_in=Clock.where(user: self.user, date: self.date, action: "check_in").first
     last_check_out=Clock.where(user: self.user, date: self.date, action: "check_out").first
     if action=="check_in" && last_check_in
-      self.errors.add(:base, "L'utente ha gia effettuato il check in alle #{last_check_in.time}")
+      self.errors.add(:base, "L'utente ha gia effettuato il check in alle #{last_check_in.time.localtime}")
       return false
     end
     if action=="check_out" && last_check_out
-      self.errors.add(:base, "L'utente ha gia effettuato il check out alle #{last_check_out.time}")
+      self.errors.add(:base, "L'utente ha gia effettuato il check out alle #{last_check_out.time.localtime}")
       return false
     end
 

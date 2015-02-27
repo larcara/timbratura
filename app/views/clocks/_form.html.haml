@@ -1,6 +1,3 @@
-= link_to "elenco utenti", users_path if current_user.is_admin?
-= link_to "elenco accessi", clocks_path if current_user.is_admin?
-= link_to "dashboard", url_for(controller: 'clocks', action: :dashboard) if current_user.is_camera?
 
 = form_for @clock , role: "form" do |f|
   - if @clock.errors.any?
@@ -13,9 +10,9 @@
     %span.col-xs-8
       ="Utente: #{current_user.username}"
     %span.col-xs-2
-      = link_to "Cambia password", edit_user_registration_path
+
     %span.col-xs-2
-      = link_to "Log Out",  destroy_user_session_path
+
   .row.well-sm
     %span.col-xs-12
       =f.hidden_field :action, id: "op"

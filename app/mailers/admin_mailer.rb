@@ -12,14 +12,17 @@ class AdminMailer < ActionMailer::Base
 
   def timesheet(date)
     @user_data={}
-    Setting.active.where(group: "user_name").each{|x| @user_data[x.value]={check_in: nil, check_in_real_time: nil , check_out: nil, check_out_real_time: nil , check_in_message: nil, check_out_message: nil}}
-
+    User.where("role <> 'caemra'").each{|x| @user_data[x.username]={check_in: nil, check_in_real_time: nil , check_out: nil, check_out_real_time: nil , check_in_message: nil, check_out_message: nil, check_in_ip: nil, check_out_ip: nil}}
+    @user_data["Header"]={check_in: "check_in", check_in_real_time: "check_in_real_time", check_out: "check_out", check_out_real_time: "check_out_real_time",
+                          check_in_message: "check_in_message", check_out_message: "check_out_message", check_in_ip: "check_in_ip", check_out_ip: "check_out_ip"}
     Clock.where( date: date).each do |t|
-      if @user_data[t.user]
-        @user_data[t.user][t.action.to_sym] = t.time.localtime
-        @user_data[t.user]["#{t.action}".to_sym] = t.time.localtime
-        @user_data[t.user]["#{t.action}_real_time".to_sym] = t.created_at.localtime
-        @user_data[t.user]["#{t.action}_message".to_sym] = t.message
+      key=t.user.username
+      if @user_data[key]
+        @user_data[key][t.action.to_sym] = t.time.localtime
+        @user_data[key]["#{t.action}".to_sym] = t.time.localtime
+        @user_data[key]["#{t.action}_real_time".to_sym] = t.created_at.localtime
+        @user_data[key]["#{t.action}_message".to_sym] = t.message
+        @user_data[key]["#{t.action}_ip".to_sym] = t.ip
       end
     end
     mail(to: ["luca.arcara@camera.it", "capcbt_carbonelli@camera.it"])
