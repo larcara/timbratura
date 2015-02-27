@@ -28,7 +28,7 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     arel (5.0.1.20140414130214)
-    bcrypt (3.1.7-x86-mingw32)
+    bcrypt (3.1.10-x86-mingw32)
     bcrypt-ruby (3.1.2-x86-mingw32)
     bootstrap-sass (3.1.1.0)
       sass (~> 3.2)
@@ -46,6 +46,9 @@ GEM
       railties (>= 3.2.6, < 5)
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
+    devise_ldap_authenticatable (0.8.1)
+      devise (>= 3.0)
+      net-ldap (>= 0.3.1, < 0.6.0)
     diff-lcs (1.2.5)
     erubis (2.7.0)
     execjs (2.1.0)
@@ -71,7 +74,8 @@ GEM
     mime-types (1.25.1)
     minitest (5.3.4)
     multi_json (1.10.1)
-    mysql2 (0.3.13)
+    mysql2 (0.3.18-x86-mingw32)
+    net-ldap (0.5.1)
     orm_adapter (0.4.0)
     polyglot (0.3.5)
     rack (1.5.2)
@@ -112,9 +116,6 @@ GEM
     sdoc (0.4.0)
       json (~> 1.8)
       rdoc (~> 4.0, < 5.0)
-    seed_dump (3.2.1)
-      activerecord (~> 4)
-      activesupport (~> 4)
     sprockets (2.11.0)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -144,20 +145,20 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  bcrypt (~> 3.1.7)
+  bcrypt (~> 3.1.8)
   bootstrap-sass
-  coffee-rails (~> 4.0.0)
+  coffee-rails
   devise
+  devise_ldap_authenticatable
   haml
   haml-rails
-  jbuilder (~> 2.0)
+  jbuilder
   jquery-rails
   mysql2
   rails (= 4.1.1)
   rspec
-  sass-rails (~> 4.0.3)
-  sdoc (~> 0.4.0)
-  seed_dump
+  sass-rails
+  sdoc
   therubyracer
   tzinfo-data
-  uglifier (>= 1.3.0)
+  uglifier

@@ -4,13 +4,14 @@ class Clock < ActiveRecord::Base
   validates_presence_of  :date
   validates_presence_of  :time
   validates_presence_of  :ip
-  validates_presence_of  :user
+  validates_presence_of  :user_id
 
-  attr_accessor :pin
+  #attr_accessor :pin
 
   validate :check_time_and_status
   validate :check_ip
   validates_length_of :message, minimum: 10, allow_nil: true, allow_blank: true, message: "Verificare la motivazione (troppo corta)"
+  belongs_to :user
 
   def check_ip
     last_check_in=Clock.where(date: self.date, ip: self.ip).first
@@ -19,7 +20,7 @@ class Clock < ActiveRecord::Base
     elsif last_check_in.user == self.user
       return true
     elsif  message.blank?
-      self.errors.add(:base, "Questo indirizzo IP risulta già utilizzato da #{last_check_in.user}. E' necessario specificare una motivazione")
+      self.errors.add(:base, "Questo indirizzo IP risulta già utilizzato da #{last_check_in.user.username}. E' necessario specificare una motivazione")
       return false
     end
   end
@@ -36,10 +37,10 @@ class Clock < ActiveRecord::Base
       return false
     end
 
-    if Setting.where(group: "user_name",key: self.pin, value: self.user).first.nil?
-      self.errors.add(:base, "il pin non è corretto")
-      return false
-    end
+    #if Setting.where(group: "user_name",key: self.pin, value: self.user).first.nil?
+    #  self.errors.add(:base, "il pin non è corretto")
+    #  return false
+    #end
 
     delta = (Time.now - self.time).to_i / 60
     if delta.abs > 6 && message.blank?

@@ -36,7 +36,7 @@ Rails.application.configure do
       address:              'posta01.intra.camera.it',
       port:                 25,
       domain:               'camera.it'}
-
+  config.action_mailer.default_url_options = { :host => 'capcbt01.intra.camera.it' }
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 end

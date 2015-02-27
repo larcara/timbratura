@@ -1,24 +1,17 @@
 Rails.application.routes.draw do
-  resources :clocks
-
+  devise_for :users  , :skip => [:registrations]
+  as :user do
+    get 'users/edit' => 'devise/registrations#edit', :as => 'edit_user_registration'
+    put 'users/:id' => 'devise/registrations#update', :as => 'user_registration'
+  end
+  resources :users
+  resources :clocks do
+    get :dashboard , on: :collection
+  end
   resources :settings
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
-  get 'home/index' => 'home#index'
-  get 'home/flot' => 'home#flot'
-  get 'home/morris' => 'home#morris'
-  get 'home/tables' => 'home#tables'
-  get 'home/forms' => 'home#forms'
-
-  get 'home/panels_wells' => 'home#panels_wells'
-  get 'home/buttons' => 'home#buttons'
-  get 'home/notifications' => 'home#notifications'
-  get 'home/typography' => 'home#typography'
-  get 'home/grid' => 'home#grid'
-  get 'home/blank' => 'home#blank'
-  get 'home/login' => 'home#login'
-
 
   # You can have the root of your site routed with "root"
   root 'clocks#new'

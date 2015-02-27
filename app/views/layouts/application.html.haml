@@ -19,6 +19,11 @@
     = javascript_include_tag "application"  , 'data-turbolinks-track' => true
 
   %body
+    .container.center
+      -if notice
+        %h3.bg-success.well-sm= notice
+      -if alert
+        %h3.bg-danger.well-sm= alert
     =yield
     / /#page-wrapper
     / /#wrapper

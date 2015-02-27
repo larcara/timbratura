@@ -1,3 +1,7 @@
+= link_to "elenco utenti", users_path if current_user.is_admin?
+= link_to "elenco accessi", clocks_path if current_user.is_admin?
+= link_to "dashboard", url_for(controller: 'clocks', action: :dashboard) if current_user.is_camera?
+
 = form_for @clock , role: "form" do |f|
   - if @clock.errors.any?
     .row.well-sm
@@ -6,17 +10,23 @@
           - @clock.errors.full_messages.each do |msg|
             %h3.bg-danger.well-sm= msg
   .row.well-sm
-    %span.col-xs-12
-      =f.select :user, options_for_select(users_for_options, @clock.user) ,{include_blank: true}, class: "form-control block"
+    %span.col-xs-8
+      ="Utente: #{current_user.username}"
+    %span.col-xs-2
+      = link_to "Cambia password", edit_user_registration_path
+    %span.col-xs-2
+      = link_to "Log Out",  destroy_user_session_path
   .row.well-sm
     %span.col-xs-12
-      =password_field_tag :pin, "", class: "form-control block" , placeholder:"insert pin here"
-      -#=f.text_field :ip
       =f.hidden_field :action, id: "op"
+  //   =password_field_tag :pin, "", class: "form-control block" , placeholder:"insert pin here"
+  //   -#=f.text_field :ip
   .row.well-sm
-    %span.col-xs-6.col-md-6
+    %span.col-xs-6.col-md-4
+      ="HH"
       =select_hour(@moment,{ start_hour: 7, end_hour: 24}, {class: "btn btn-lg btn-default btn-block"})
-    %span.col-xs-6.col-md-6
+    %span.col-xs-6.col-md-4
+      ="MM"
       =select_minute(@moment, {minute_step: 1}, {class: "btn btn-lg btn-default btn-block"})
 
     -#%span.col-xs-2
@@ -31,9 +41,6 @@
     %span.col-xs-12
       %label.col-xs-2.control-label Annotazioni
       = f.text_area :message, class: "form-control block",  :rows => "3"
--if flash[:notice]
-  %h3.bg-success.well-sm= flash[:notice]
-
 
 :javascript
     $(document).ready( function() {
