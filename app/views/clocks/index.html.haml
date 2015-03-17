@@ -18,7 +18,7 @@
       %td= clock.created_at.localtime
       %td= clock.date
       %td= clock.time.localtime
-      %td= clock.user.username
+      %td= clock.user.username if clock.user
       %td= clock.ip
       %td= clock.action
       %td= clock.message

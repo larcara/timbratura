@@ -1,0 +1,12 @@
+
+%table
+  %tr
+    %th=@from_date.month
+    -(@from_date..@to_date).each do |date|
+      %th{colspan:4}=date
+
+  -@result.each do |sla, values|
+    %tr
+      %td=sla
+      -values.each do |value|
+        %td=value

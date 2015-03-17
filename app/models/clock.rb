@@ -13,6 +13,7 @@ class Clock < ActiveRecord::Base
   validates_length_of :message, minimum: 10, allow_nil: true, allow_blank: true, message: "Verificare la motivazione (troppo corta)"
   belongs_to :user
 
+
   def check_ip
     last_check_in=Clock.where(date: self.date, ip: self.ip).first
     if last_check_in.nil?

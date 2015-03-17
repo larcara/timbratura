@@ -6,7 +6,9 @@ Rails.application.routes.draw do
   end
   resources :users
   resources :clocks do
-    get :dashboard , on: :collection
+      get :dashboard , on: :collection
+      get :export, on: :collection
+      get :check_sla, on: :collection
   end
   resources :settings
 

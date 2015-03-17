@@ -1,12 +1,54 @@
 class ClocksController < ApplicationController
   before_action :set_clock, only: [:show, :edit, :update, :destroy]
   before_filter :check_administrative_ip, except: [:new, :create]
+  before_action :authenticate_user!
+
+
+  # GET /export
+  # GET /export.json
+  def export
+    @month=Date.today
+    @from_date=@month.at_beginning_of_month
+    @to_date=@month.at_end_of_month
+    areas= User.uniq.pluck(:area).compact.uniq
+    @result={}
+    areas.each do |area|
+      @result[area]=User.where(area: area).map do |user|
+        user.report(@month)
+      end
+    end
+  end
+
+  # GET /check_sla
+  # GET /check_sla.json
+  def check_sla
+    @month=Date.today
+    @from_date=@month.at_beginning_of_month
+    @to_date=@month.at_end_of_month
+
+
+    @cicles=(20-8)*4 #each 15 minute from 8 to 20
+    areas= User.uniq.pluck(:area).compact.uniq
+    @result={}
+    areas.each do |area|
+      start=Time.parse("08:00:00")
+      @cicles.times do |i|
+        @result[start.strftime("%H:%M")]=[]
+        (@from_date..@to_date).each do |date|
+          checked_in = Clock.joins(:user).where(users:{area:area}, date:date).where(["action = 'check_in' and time <= ?", start]).count
+          checked_out = Clock.joins(:user).where(users: {area:area}, date:date).where(["action = 'check_out' and time >= ?", start]).count
+          @result[start.strftime("%H:%M")] << (checked_in-checked_out)
+        end
+        start=start.advance(minutes: 15)
+      end
+    end
+  end
 
 
   # GET /clocks
   # GET /clocks.json
   def index
-    redirect_to url_for(action: :dashboard) if current_user.is_camera?
+    redirect_to url_for(action: :dashboard) if (current_user.is_camera? && !current_user.is_admin?)
     @clocks = Clock.all
   end
 
@@ -26,7 +68,7 @@ class ClocksController < ApplicationController
 
   # GET /clocks/new
   def new
-    redirect_to url_for(action: :dashboard) if current_user.is_camera?
+    redirect_to url_for(action: :dashboard) if (current_user.is_camera? && !current_user.is_admin?)
     #@preset_ip=Setting.where(group: "ips", key: request.remote_ip).first
     @moment=Time.now.at_beginning_of_minute
     @clock = Clock.new()
@@ -53,8 +95,8 @@ class ClocksController < ApplicationController
     respond_to do |format|
       if @clock.save
         message="Registrazione #{@clock.action} per #{@clock.user.username} alle #{@clock.time.localtime} avvenuta con successo."
-        #AdminMailer.timesheet(Date.today).deliver
-        #AdminMailer.confirm_mail(current_user, "#{message}\r\n#{@clock.message}").deliver
+        AdminMailer.timesheet(Date.today).deliver
+        AdminMailer.confirm_mail(current_user, "#{message}\r\n#{@clock.message}").deliver
 
         format.html { redirect_to new_clock_url, notice: message }
         format.json { render :show, status: :created, location: @clock }

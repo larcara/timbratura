@@ -1,5 +1,5 @@
 class AdminMailer < ActionMailer::Base
-  default from: "luca.arcara@camera.it"
+  default from: "no-reply@camera.it"
 
   def test_mail(clock)
     mail(to: ["luca.arcara@camera.it"],  body: clock.to_s)
@@ -12,7 +12,7 @@ class AdminMailer < ActionMailer::Base
 
   def timesheet(date)
     @user_data={}
-    User.where("role <> 'caemra'").each{|x| @user_data[x.username]={check_in: nil, check_in_real_time: nil , check_out: nil, check_out_real_time: nil , check_in_message: nil, check_out_message: nil, check_in_ip: nil, check_out_ip: nil}}
+    User.where("coalesce(role,'') = ''").each{|x| @user_data[x.username]={check_in: nil, check_in_real_time: nil , check_out: nil, check_out_real_time: nil , check_in_message: nil, check_out_message: nil, check_in_ip: nil, check_out_ip: nil}}
     @user_data["Header"]={check_in: "check_in", check_in_real_time: "check_in_real_time", check_out: "check_out", check_out_real_time: "check_out_real_time",
                           check_in_message: "check_in_message", check_out_message: "check_out_message", check_in_ip: "check_in_ip", check_out_ip: "check_out_ip"}
     Clock.where( date: date).each do |t|

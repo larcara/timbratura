@@ -1,0 +1,23 @@
+
+%table
+  %tr
+    %th=@from_date.month
+    -(@from_date..@to_date).each do |date|
+      %th{colspan:4}=date
+
+  -@result.keys.each do |area|
+    %tr
+      %td=area
+      -(@from_date..@to_date).each do |date|
+        %th="E."
+        %th="U."
+        %th="ore lavorate"
+        %th="[+] o [-] orario"
+    -@result[area].each do |user|
+      %tr
+        %td=user[:user]
+        -(@from_date..@to_date).each do |date|
+          %td=user[date.to_s][:check_in]
+          %td=user[date.to_s][:check_out]
+          %td=user[date.to_s][:worked_hours]
+          %td=user[date.to_s][:delta]
