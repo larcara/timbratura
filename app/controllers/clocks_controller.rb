@@ -17,6 +17,7 @@ class ClocksController < ApplicationController
         user.report(@month)
       end
     end
+    render layout: false
   end
 
   # GET /check_sla
@@ -27,21 +28,23 @@ class ClocksController < ApplicationController
     @to_date=@month.at_end_of_month
 
 
-    @cicles=(20-8)*4 #each 15 minute from 8 to 20
+    @cicles=(21-8)*4 #each 15 minute from 8 to 20
     areas= User.uniq.pluck(:area).compact.uniq
     @result={}
     areas.each do |area|
-      start=Time.parse("08:00:00")
-      @cicles.times do |i|
-        @result[start.strftime("%H:%M")]=[]
-        (@from_date..@to_date).each do |date|
-          checked_in = Clock.joins(:user).where(users:{area:area}, date:date).where(["action = 'check_in' and time <= ?", start]).count
-          checked_out = Clock.joins(:user).where(users: {area:area}, date:date).where(["action = 'check_out' and time >= ?", start]).count
-          @result[start.strftime("%H:%M")] << (checked_in-checked_out)
-        end
-        start=start.advance(minutes: 15)
+      @result[area]={}
+      (@from_date..@to_date).each_with_index do |date, date_index|
+        start=Time.parse("08:00:00", date)
+          @cicles.times do |i|
+            @result[area][start.strftime("%H:%M")] ||= []
+            checked_in = Clock.joins(:user).where(users:{area:area}, date:date).where(["action = 'check_in' and time <= ?", start]).count
+            checked_out = Clock.joins(:user).where(users: {area:area}, date:date).where(["action = 'check_out' and time <= ?", start]).count
+            @result[area][start.strftime("%H:%M")][date_index] =  (checked_in-checked_out)
+            start=start.advance(minutes: 15)
+          end
       end
     end
+    render layout: false
   end
 
 
