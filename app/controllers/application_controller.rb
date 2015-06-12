@@ -15,5 +15,11 @@ class ApplicationController < ActionController::Base
     return false
   end
 
-  ADMINISTRATIVE_IPS = ["127.0.0.1","10.103.142.168","10.103.171.191"]
+  def check_admin_role
+    redirect_to new_clock_url unless current_user.is_admin?
+    #redirect_to url_for(action: :dashboard) if (current_user && current_user.is_camera? && !current_user.is_admin?)
+    return true
+  end
+
+  ADMINISTRATIVE_IPS = ["127.0.0.1","10.103.142.168","10.103.171.191", "10.103.142.249"]
 end

@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
@@ -35,7 +35,7 @@ gem "rspec"  , group: [:development, :test]
 gem 'bcrypt', '~> 3.1.8'
 #gem "bcrypt_ext"
 #gem "seed_dump"
-
+gem 'spreadsheet', '~> 1.0.3'
 # Use unicorn as the app server
 # gem 'unicorn'
 

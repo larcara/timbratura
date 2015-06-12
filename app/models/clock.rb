@@ -15,6 +15,7 @@ class Clock < ActiveRecord::Base
 
 
   def check_ip
+    return true unless self.new_record?
     last_check_in=Clock.where(date: self.date, ip: self.ip).first
     if last_check_in.nil?
       return true
@@ -27,6 +28,7 @@ class Clock < ActiveRecord::Base
   end
 
   def  check_time_and_status
+    return true unless self.new_record?
     last_check_in=Clock.where(user: self.user, date: self.date, action: "check_in").first
     last_check_out=Clock.where(user: self.user, date: self.date, action: "check_out").first
     if action=="check_in" && last_check_in

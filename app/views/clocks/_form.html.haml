@@ -8,14 +8,19 @@
             %h3.bg-danger.well-sm= msg
   .row.well-sm
     %span.col-xs-8
-      ="Utente: #{current_user.username}"
+      ="Utente: #{@clock.user.username}"
     %span.col-xs-2
-
+      ="Data: #{@clock.date}"
     %span.col-xs-2
+      -if current_user.is_admin?
+        =f.label :tipo
+        =f.select :tipo, options_for_select(["","Festivo", "Ferie/PAR", "Formazione", "Malattia", "Permesso Legge 104"])
 
   .row.well-sm
     %span.col-xs-12
       =f.hidden_field :action, id: "op"
+      =f.hidden_field :user_id
+      =f.hidden_field :date
   //   =password_field_tag :pin, "", class: "form-control block" , placeholder:"insert pin here"
   //   -#=f.text_field :ip
   .row.well-sm

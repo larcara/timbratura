@@ -5,19 +5,33 @@
     -(@from_date..@to_date).each do |date|
       %th{colspan:4}=date
 
-  -@result.keys.each do |area|
+  -@result.keys.sort.each do |area|
     %tr
-      %td=area
+      %th=area
       -(@from_date..@to_date).each do |date|
         %th="E."
         %th="U."
-        %th="ore lavorate"
-        %th="[+] o [-] orario"
+        %th="ore"
+        %th="[+] o [-]"
+      %th="Assenze"
+      %th="Totale Ore Lavorate"
+      %th="Totale per Tipo"
     -@result[area].each do |user|
       %tr
         %td=user[:user]
         -(@from_date..@to_date).each do |date|
-          %td=user[date.to_s][:check_in]
-          %td=user[date.to_s][:check_out]
+          %td
+            -if user[date.to_s][:check_in_id]
+              =link_to user[date.to_s][:check_in], edit_clock_url(user[date.to_s][:check_in_id])
+            -else
+              =link_to "+", new_clock_url(clock: {date: date, user_id:user[:user_id]}), target: "_blank" if params[:format].blank?
+          %td
+            -if user[date.to_s][:check_out_id]
+              =link_to user[date.to_s][:check_out], edit_clock_url(user[date.to_s][:check_out_id])
+            -else
+              =link_to "+", new_clock_url(clock: {date: date, user_id:user[:user_id]} ), target: "_blank"  if params[:format].blank?
           %td=user[date.to_s][:worked_hours]
           %td=user[date.to_s][:delta]
+        %td=user[:tot_absence].round(2)
+        %td=user[:tot_hours].round(2)
+        %td=user[:tot_by_tipo]

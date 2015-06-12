@@ -1,7 +1,29 @@
-%h1 Editing clock
-
-= render 'form'
-
-= link_to 'Show', @clock
-\|
-= link_to 'Back', clocks_path
+%h1 MANUTENZIONE
+= form_for @clock , role: "form" do |f|
+  - if @clock.errors.any?
+    .row.well-sm
+      %span.col-xs-12
+        #error_explanation
+          - @clock.errors.full_messages.each do |msg|
+            %h3.bg-danger.well-sm= msg
+  .row
+    %span.col-md-4=f.label :action
+    %span.col-md-6=f.text_field :action
+  .row
+    %span.col-md-4=f.label :tipo
+    %span.col-md-6=f.select :tipo, options_for_select(["","Festivo", "Ferie/PAR", "Formazione", "Malattia", "Permesso Legge 104"])
+  .row
+    %span.col-md-4=f.label :date
+    %span.col-md-6=f.text_field :date
+  .row
+    %span.col-md-4=f.label :time
+    %span.col-md-3
+      ="HH"
+      =select_hour(@clock.time.localtime,{ start_hour: 0, end_hour: 24}, {class: "btn btn-lg btn-default btn-block"})
+    %span.col-md-3
+      ="MM"
+      =select_minute(@clock.time.localtime, {minute_step: 1}, { class: "btn btn-lg btn-default btn-block"})
+  .row
+    %span.col-md-4=f.label :message
+    %span.col-md-6= f.text_area :message, class: "form-control block",  :rows => "3"
+  =f.submit "Save"

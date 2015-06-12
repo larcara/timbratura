@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150227141224) do
+ActiveRecord::Schema.define(version: 20150326154944) do
 
   create_table "clocks", force: true do |t|
     t.date     "date"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 20150227141224) do
     t.string   "status"
     t.datetime "time"
     t.integer  "user_id"
+    t.string   "tipo"
   end
 
   create_table "settings", force: true do |t|
