@@ -29,11 +29,17 @@ class ClocksController < ApplicationController
         new_book.create_worksheet :name => 'timesheet'
         sheet=new_book.worksheet(0)
         counter=0
+
+        row_data=[""]
+        (@from_date..@to_date).each{|date| row_data +=  [date.strftime("%A"), "", "", "", ""] }
+        sheet.update_row counter+=1 ,  *row_data
+
         row_data=[]
         row_data << @from_date.month
         (@from_date..@to_date).each{|date| row_data +=  [date, "", "", "", ""] }
         row_data += [ "Totale Ore Lavorate", "Totale per Tipo"]
         sheet.update_row counter+=1 ,  *row_data
+
         row_data=[]
         @result.keys.sort.each do |area|
           row_data=[]
@@ -81,15 +87,16 @@ class ClocksController < ApplicationController
     @result={}
     areas.each do |area|
       @result[area]={}
-      (@from_date..@to_date).each_with_index do |date, date_index|
-        start=Time.parse("08:00:00", date)
-          @cicles.times do |i|
-            @result[area][start.strftime("%H:%M")] ||= []
-            checked_in  = Clock.joins(:user).where(users:{area:area}, date:date).where(["coalesce(tipo,'')='' and action = 'check_in' and time <= ?", start]).count
-            checked_out = Clock.joins(:user).where(users: {area:area}, date:date).where(["coalesce(tipo,'')='' and action = 'check_out' and time <= ?", start]).count
-            @result[area][start.strftime("%H:%M")][date_index] =  (checked_in-checked_out)
-            start=start.advance(minutes: 15)
-          end
+      start=Time.parse("08:00:00",@from_date)
+      @cicles.times do |i|
+        utc_time=start.dup.utc
+        checked_in  = Clock.joins(:user).where(users:{area:area}, date: (@from_date..@to_date)).where(["coalesce(tipo,'')='' and action = 'check_in' and Time(time) <= ?", utc_time.strftime("%H:%M")]).group(:date).count
+        checked_out = Clock.joins(:user).where(users:{area:area}, date: (@from_date..@to_date)).where(["coalesce(tipo,'')='' and action = 'check_out' and Time(time) <= ?", utc_time.strftime("%H:%M")]).group(:date).count
+        (@from_date..@to_date).each_with_index do |date, date_index|
+          @result[area][start.strftime("%H:%M")] ||= []
+          @result[area][start.strftime("%H:%M")][date_index] =  (checked_in[date].to_i-checked_out[date].to_i)
+        end
+        start=start.advance(minutes: 15)
       end
     end
     respond_to do |format|
@@ -101,16 +108,27 @@ class ClocksController < ApplicationController
         Spreadsheet.client_encoding = 'UTF-8'
         @result.each_key do |area|
           counter=0
-          new_book.create_worksheet :name => "#{area}"
-          sheet=new_book.worksheet(area)
+          next if area.to_s ==""
+          name="CheckSla #{area.tableize[0..10]}"
+          new_book.create_worksheet :name => name
+          sheet=new_book.worksheet(name)
           sheet.update_row counter+=1 , "Area: #{area}" , "Mese :#{@from_date.month}"
+          row_data=["WEEKDAY:"]
+          row_data += (@from_date..@to_date).to_a.map{|d| d.strftime("%A")}
+          sheet.update_row  counter +=1, *row_data
           row_data=[""]
           row_data += (@from_date..@to_date).to_a
-          sheet.update_row counter+=1 , *row_data
-          row_data=[]
-          @result[area].each do |sla, values|
-            row_data << sla
+          sheet.update_row  counter +=1, *row_data
+          @result[area].each do |hh, values|
+            #hh => "08:00", "08:15"
+            row_data=[]
+            row_data << hh
+            puts values.inspect
             row_data += values
+            #values.each do |dd,counters|
+            #end
+            sheet.update_row  counter+=1, *row_data
+
           end
         end
         new_book.write spreadsheet
@@ -132,7 +150,11 @@ class ClocksController < ApplicationController
   # GET /clocks.json
   def dashboard
     current_date=Date.today
-    @clocks = Clock.joins(:user).where(date: current_date).group_by{|x| [x.user.area, x.user.username]}
+    check_in  = Clock.joins(:user).where(action: "check_in", date: current_date).group(:area).count
+    check_out = Clock.joins(:user).where(action: "check_out", date: current_date).group(:area).count
+    check_out.each { |area,value| check_in[area]+=-value if check_in[area]}
+    @clocks = check_in
+    #@clocks = Clock.joins(:user).where(action: "check-in", date: current_date).group{|x| [x.user.area]}.count
   end
 
   # GET /clocks/1

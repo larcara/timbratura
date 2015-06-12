@@ -27,7 +27,6 @@
           %li= link_to "Entrate mese prec", url_for(controller: :clocks, action: :export, date: (Date.today-1.months)) if current_user && current_user.is_admin?
           %li= link_to "CheckSLA mese prec", url_for(controller: :clocks, action: :check_sla, date: (Date.today-1.months), format: :xls) if current_user && current_user.is_admin?
           %li= link_to "elenco utenti", users_path if current_user && current_user.is_admin?
-          %li= link_to "elenco utenti", users_path if current_user && current_user.is_admin?
           %li= link_to "elenco accessi", clocks_path if current_user && current_user.is_admin?
           %li= link_to "dashboard", dashboard_clocks_path if current_user && current_user.is_camera?
           %li= link_to "Log Out",  destroy_user_session_path if current_user

@@ -1,19 +1,11 @@
 %table.table.table-striped
   %tr
     %th AREA
-    %th utente
-    %th check-in
-    %th
-    %th check-out
-    %th
-  - @clocks.each do |k,clocks|
+    %th Presenze
+
+  - @clocks.each do |k,v|
     %tr
       %th
-        %h3="AREA #{k[0]}" unless k[0].blank?
-    -unless k[0].blank?
-      %tr
-        %td
-        %td= k[1]
-        -clocks.each do |clock|
-          %td= clock.action
-          %td= clock.time.localtime
+        %h3="#{k}"
+      %th
+        %h3="#{v}"

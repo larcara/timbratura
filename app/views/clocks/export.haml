@@ -1,9 +1,9 @@
-
+=link_to "Esporta in xls", url_for(controller: :clocks,action:  :export, format: :xls, data: params[:data])
 %table
   %tr
     %th=@from_date.month
     -(@from_date..@to_date).each do |date|
-      %th{colspan:4}=date
+      %th{colspan:2}=date
 
   -@result.keys.sort.each do |area|
     %tr
@@ -11,8 +11,8 @@
       -(@from_date..@to_date).each do |date|
         %th="E."
         %th="U."
-        %th="ore"
-        %th="[+] o [-]"
+        //%th="ore"
+        //%th="[+] o [-]"
       %th="Assenze"
       %th="Totale Ore Lavorate"
       %th="Totale per Tipo"
@@ -20,18 +20,18 @@
       %tr
         %td=user[:user]
         -(@from_date..@to_date).each do |date|
-          %td
+          %td{class: "color#{date.wday}"}
             -if user[date.to_s][:check_in_id]
               =link_to user[date.to_s][:check_in], edit_clock_url(user[date.to_s][:check_in_id])
             -else
               =link_to "+", new_clock_url(clock: {date: date, user_id:user[:user_id]}), target: "_blank" if params[:format].blank?
-          %td
+          %td.border-left{class: "color#{date.wday}"}
             -if user[date.to_s][:check_out_id]
               =link_to user[date.to_s][:check_out], edit_clock_url(user[date.to_s][:check_out_id])
             -else
               =link_to "+", new_clock_url(clock: {date: date, user_id:user[:user_id]} ), target: "_blank"  if params[:format].blank?
-          %td=user[date.to_s][:worked_hours]
-          %td=user[date.to_s][:delta]
+          //%td=user[date.to_s][:worked_hours]
+          //%td=user[date.to_s][:delta]
         %td=user[:tot_absence].round(2)
         %td=user[:tot_hours].round(2)
         %td=user[:tot_by_tipo]
